@@ -4,6 +4,8 @@ library(DMwR)
 library(missForest)
 library(readxl)  # Para leer archivos .xls y .xlsx
 library(bslib)
+library(writexl)  # Para exportar a Excel si lo deseas también
+
 
 my_theme <- bs_theme(
   #bg = "#9BB3E8",       # Fondo color azul claro
@@ -18,7 +20,7 @@ my_theme <- bs_theme(
 
 ui <- fluidPage(
   theme = my_theme,
-  titlePanel(h1("Imputación de Datos Faltantes")),
+  titlePanel("Imputación de Datos Faltantes"),
   
   sidebarLayout(
     sidebarPanel(
@@ -27,7 +29,8 @@ ui <- fluidPage(
       checkboxInput("transpose", "Transponer los datos", value = FALSE),
       selectInput("imputation_method", "Seleccione el método de imputación:",
                   choices = c("Media", "k-NN", "MICE", "Random Forest")),
-      actionButton("impute", "Imputar Datos")
+      actionButton("impute", "Imputar Datos"),
+      downloadButton("downloadData", "Descargar Datos Imputados")
     ),
     
     mainPanel(
@@ -52,8 +55,6 @@ server <- function(input, output) {
       data <- read_excel(input$file$datapath)
     }
     
-    # Introducimos NA's en algunas filas de ejemplo (puedes quitar esto en producción)
-    data[sample(1:nrow(data), min(20, nrow(data))), sample(1:ncol(data), min(2, ncol(data)))] <- NA
     data
   })
   
@@ -98,6 +99,16 @@ server <- function(input, output) {
   output$imputedDataTable <- renderTable({
     imputed_data()
   })
+  
+  # Permitir descargar el archivo imputado
+  output$downloadData <- downloadHandler(
+    filename = function() {
+      paste("datos_imputados_", Sys.Date(), ".csv", sep = "")
+    },
+    content = function(file) {
+      write.csv(imputed_data(), file, row.names = FALSE)
+    }
+  )
 }
 
 shinyApp(ui = ui, server = server)
