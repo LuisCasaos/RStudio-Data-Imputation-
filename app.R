@@ -3,9 +3,22 @@ library(mice)
 library(DMwR)
 library(missForest)
 library(readxl)  # Para leer archivos .xls y .xlsx
+library(bslib)
+
+my_theme <- bs_theme(
+  #bg = "#9BB3E8",       # Fondo color azul claro
+  #fg = "#00264d",       # Color de texto (azul oscuro)
+  primary = "#1E90FF",  # Color principal (botones, links, etc.)
+  base_font = font_google("Roboto"),   # Tipografía personalizada desde Google Fonts
+  heading_font = font_google("Montserrat"),  # Tipografía para encabezados
+  font_scale = 1.1  # Escala de la fuente
+)
+
+
 
 ui <- fluidPage(
-  titlePanel("Imputación de Datos Faltantes"),
+  theme = my_theme,
+  titlePanel(h1("Imputación de Datos Faltantes")),
   
   sidebarLayout(
     sidebarPanel(
